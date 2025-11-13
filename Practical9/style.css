@@ -1,0 +1,36 @@
+    body {
+      font-family: Arial, sans-serif;
+      transition: background-color 0.5s, color 0.5s, font-size 0.3s;
+      text-align: center;
+      padding: 20px;
+    }
+    .dark {
+      background-color: #121212;
+      color: #ffffff;
+    }
+    .light {
+      background-color: #ffffff;
+      color: #000000;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    input, textarea, select {
+      margin: 5px;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 250px;
+    }
+    section {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }

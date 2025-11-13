@@ -1,0 +1,17 @@
+<html>
+    <head><title>Regex Methods</title></head>
+    <body>
+        <script>
+            let str = prompt("Enter a string:");
+            let regex = /a+/gi;
+            document.write(str + "<br>"+"<br>");
+            document.write("test(): " + regex.test(str) + "<br>");
+            document.write("exec(): " + (regex.exec(str)) + "<br>");
+            document.write("match(): " + (str.match(regex)) + "<br>");
+            document.write("matchAll(): " + [...str.matchAll(regex)] + "<br>");
+            document.write("replace(): " + str.replace(regex, "#") + "<br>");
+            document.write("search(): " + str.search(regex) + "<br>");
+            document.write("split(): " + str.split(regex) + "<br>");
+        </script>
+    </body>
+</html>

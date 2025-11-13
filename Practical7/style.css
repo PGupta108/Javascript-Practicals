@@ -1,0 +1,58 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  text-align: center;
+  margin: 50px;
+}
+h1 {
+  color: #333;
+}
+.input-area {
+  margin-bottom: 20px;
+}
+#taskInput {
+  padding: 8px;
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+button {
+  padding: 8px 12px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #45a049;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+  max-width: 400px;
+  margin: 0 auto;
+}
+li {
+  background-color: white;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+li span {
+  flex: 1;
+  text-align: left;
+}
+.action-btns button {
+  margin-left: 6px;
+  background-color: #ff6666;
+}
+.action-btns .edit-btn {
+  background-color: #2196F3;
+}
+.action-btns button:hover {
+  opacity: 0.8;
+}

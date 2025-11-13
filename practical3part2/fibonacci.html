@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head><title>Fibonacci Series</title></head>
+    <body>
+        <script>
+            var n = 50;
+            var a = 0, b = 1;
+            document.write("Fibonacci numbers up to " + n + ": <br>");
+            while (a <= n) {
+                document.write(a + "<br>");
+                var next = a + b;
+                a = b;
+                b = next;
+                }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,20 @@
+
+<html>
+    <head><title>Name Formatter</title></head>
+    <body>
+        <script>
+            let nameInput = prompt("Enter your name:");
+
+            let trimmed = nameInput.trim();
+
+            let spaceIndex = trimmed.indexOf(" ");
+
+            let firstName = trimmed.charAt(0).toUpperCase() + trimmed.slice(1, spaceIndex).toLowerCase();
+
+            let lastName = trimmed.charAt(spaceIndex + 1).toUpperCase() + trimmed.slice(spaceIndex + 2).toLowerCase();
+
+            let formattedName = firstName + " " + lastName;
+            alert("Formatted Name: " + formattedName);
+        </script>
+    </body>
+</html>

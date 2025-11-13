@@ -1,0 +1,47 @@
+body {
+    font-family: "Poppins", sans-serif;
+    background: antiquewhite;
+    color: white;
+    padding: 40px;
+}
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+form {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 25px;
+    border-radius: 15px;
+    width: 400px;
+    margin: auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+input, select {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    margin-top: 4px;
+}
+input[type="submit"] {
+    background: #6a11cb;
+    color: white;
+    font-size: 16px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+input[type="submit"]:hover {
+    background: #2575fc;
+}
+small {
+    color: #ff9e9e;
+    font-size: 13px;
+}
+.gender {
+    margin-top: 5px;
+}

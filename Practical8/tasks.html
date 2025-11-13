@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation Techniques</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Gym Admission Form</h1>
+    <form id="gymForm" onsubmit="return validateForm()" novalidate>
+        <label>Username:</label>
+        <input type="text" id="username" name="username" required>
+        <small id="errorUsername"></small>
+        <label>Email:</label>
+        <input type="email" id="email" name="email" required oninvalid="this.setCustomValidity('Enter a valid email!')" onchange="validateEmail()">
+        <small id="errorEmail"></small>
+        <label>Age:</label>
+        <input type="number" id="age" name="age" required>
+        <small id="errorAge"></small>
+        <label>Password:</label>
+        <input type="password" id="password" required>
+        <small id="errorPassword"></small>
+        <label>Confirm Password:</label>
+        <input type="password" id="confirmPassword" required>
+        <small id="errorConfirm"></small>
+        <label>Gender:</label>
+        <div class="gender">
+            <input type="radio" name="gender" value="Male"> Male
+            <input type="radio" name="gender" value="Female"> Female
+        </div>
+        <small id="errorGender"></small>
+        <label>City:</label>
+        <select id="city">
+            <option value="">--Select City--</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Bangalore">Bangalore</option>
+        </select>
+        <small id="errorCity"></small>
+        <label>Date of Birth:</label>
+        <input type="date" id="dob" required>
+        <small id="errorDOB"></small>
+        <label>Resume (PDF only, ≤2MB):</label>
+        <input type="file" id="resume" accept=".pdf">
+        <small id="errorFile"></small>
+        <p id="liveValidation"></p>
+        <input type="submit" value="Submit">
+    </form>
+    <script src="script.js"></script>
+</body>
+</html>

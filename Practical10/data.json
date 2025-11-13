@@ -1,0 +1,7 @@
+[
+  { "id": 1, "name": "Mrunali", "marks": 85, "grade": "A" },
+  { "id": 2, "name": "Priya", "marks": 92, "grade": "A+" },
+  { "id": 3, "name": "Ayaan", "marks": 78, "grade": "B" },
+  { "id": 4, "name": "Om", "marks": 95, "grade": "A+" },
+  { "id": 5, "name": "Heer", "marks": 67, "grade": "C" }
+]

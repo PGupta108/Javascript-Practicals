@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head><title>Game NPC Decision Logic</title></head>
+    <body>
+        <script>
+            let health = 20; 
+            let reputation = 30; 
+            let inventory = ["magic ring"];
+            if (health < 30 && reputation > 20) {
+                console.log("NPC says: You seem weak, but you're respected. I'll help you.");
+            } else if (reputation < -40 && inventory.includes("magic ring")) {
+                console.log("NPC says: I don't like you, but that magic ring is valuable... I’ll trade, not fight.");
+            } else if (health > 80 && reputation < 0) {
+                console.log("NPC says: You look healthy, but your past actions make me suspicious. Stay away!");
+            } else if (health > 80 && reputation > 0) {
+                console.log("NPC says: You're in good shape and well-liked. Let's team up!");
+            } else if (inventory.includes("sword")) {
+                console.log("NPC says: Armed with a sword, huh? I’ll keep my distance.");
+            } else {
+                console.log("NPC says: I’m not sure what to make of you... proceed with caution.");
+            }
+        </script>
+    </body>
+</html>

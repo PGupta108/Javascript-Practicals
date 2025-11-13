@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head><title>AI Emotion Detector</title></head>
+    <body>
+        <script>
+            let score = Number(prompt("Enter sentiment score (-10 to +10):"));
+            let keyword = prompt("Enter emotion keyword:").toLowerCase();
+            if (score === 0 && !keyword) {
+                console.log("I'm not sure how you're feeling. Can you tell me more?");
+            }else if (keyword === "tired") {
+                if (score >= 5) {
+                    console.log("You seem tired but positive. Maybe take a break and enjoy the moment.");
+                } else {
+                    console.log("You seem exhausted. Rest might help.");
+                }
+            }else if (keyword === "confused") {
+                if (score < 0) {
+                    console.log("Sounds like you're struggling. Want me to help explain or guide you?");
+                } else {
+                    console.log("A little confusion is part of learning. Let's figure it out together.");
+                }
+            }else if (keyword === "excited") {
+                if (score > 5) {
+                    console.log("That's awesome! What’s got you so excited?");
+                } else {
+                    console.log("You seem excited, but something might be holding you back. Want to talk?");
+                }
+            }else {
+                if (score > 5) {
+                    console.log("You seem happy! Glad to hear that.");
+                } else if (score < -5) {
+                    console.log("I'm here for you. Want to talk about what's bothering you?");
+                } else {
+                    console.log("Thanks for sharing. How can I support you further?");
+                }
+            }
+        </script>
+    </body>
+</html>

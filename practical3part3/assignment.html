@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Grade sheet</title>
+    </head>
+    <body>
+        <h2>Grade Sheet</h2>
+        <label for="marks">Enter your marks(0-100): </label>
+        <input type="number" id="marks" min="0" max="100">
+        <button onclick="classifyGrade()">Check the Grades</button>
+        <div id="result"></div>
+        <script>
+            function classifyGrade(){
+                const marks = parseInt(document.getElementById('marks').value,10);
+                let grade='';
+
+                if(isNaN(marks) || marks<0 || marks>100){
+                    grade='Please enter valid marks between 0 and 100.';
+                }else if(marks>=90){
+                    grade='Grade: A+';
+                }else if(marks>=80){
+                    grade='Grade: A';
+                }else if(marks>=70){
+                    grade='Grade: B';
+                }else if(marks>=60){
+                    grade='Grade: C';
+                }else if(marks>=50){
+                    grade='Grade: D';
+                }else{
+                    grade='Grade: F (fail)';
+                }
+                document.getElementById('result').textContent=grade;
+            }
+        </script>
+    </body>
+</html>

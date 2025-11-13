@@ -1,0 +1,35 @@
+<html>
+    <head><title>String Methods Example</title></head>
+    <body>
+        <script>
+            let str = prompt("Enter a string:");
+            
+            let result = "";
+            result += "Length: " + str.length + "\n";
+
+            result += "Character at index 2: " + str.charAt(2) + "\n";
+
+            result += "First occurrence of 'a': " + str.indexOf("a") + "\n";
+
+            result += "Last occurrence of 'a': " + str.lastIndexOf("a") + "\n";
+
+            result += "Slice (1, 5): " + str.slice(1, 4) + "\n";
+
+            result += "Substring (1, 5): " + str.substring(1, 4) + "\n";
+
+            result += "Split by space: " + str.split(" ") + "\n";
+
+            result += "Replace first 'a' with '@': " + str.replace("a", "@") + "\n";
+
+            result += "Uppercase: " + str.toUpperCase() + "\n";
+
+            result += "Lowercase: " + str.toLowerCase() + "\n";
+
+            result += "Trimmed string: '" + str.trim() + "'\n";
+
+            result += "Includes 'a'? " + str.includes("a") + "\n";
+
+            alert(result);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Web Storage & State Management</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1> Web Storage and State Management</h1>
+  <!-- Basic localStorage & sessionStorage -->
+  <section id="storageDemo">
+    <h2>Example 1: Basic localStorage & sessionStorage</h2>
+    <input type="text" id="username" placeholder="Enter your name">
+    <button onclick="saveData()">Save</button>
+    <button onclick="loadData()">Load</button>
+    <button onclick="clearData()">Clear</button>
+    <p id="output"></p>
+  </section>
+  <!--Theme & Font Preference -->
+  <section id="themeSection">
+    <h2>Example 2: Theme & Font Preferences</h2>
+    <button id="toggleTheme">Toggle Theme</button>
+    <select id="fontSizeSelect">
+      <option value="small">Small Font</option>
+      <option value="medium">Medium Font</option>
+      <option value="large">Large Font</option>
+    </select>
+  </section>
+  <!--Session Counter -->
+  <section id="counterSection">
+    <h2>Example 3: Session Counter</h2>
+    <p id="counter"></p>
+  </section>
+  <!--Form with sessionStorage -->
+  <section id="formSection">
+    <h2>Example 4: Form with sessionStorage</h2>
+    <form>
+      <input type="text" id="name" placeholder="Name"><br>
+      <input type="email" id="email" placeholder="Email"><br>
+      <textarea id="message" placeholder="Message"></textarea><br>
+    </form>
+    <p id="formStatus"></p>
+  </section>
+  <script src="script.js"></script>
+</body>
+</html>

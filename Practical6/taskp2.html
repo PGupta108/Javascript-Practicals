@@ -1,0 +1,44 @@
+<html>
+    <head><title>Tasks part 2</title></head>
+    <body>
+        <script>
+            // Task 1: Validate Mobile Number
+            console.log("--Task 1: Validate Mobile Number--");
+            let mobileRegex = /^[6-9]\d{9}$/;
+
+            let mobiles = ["9876543210", "1234567890"];
+            mobiles.forEach(num => {
+                console.log(`${num} → ${mobileRegex.test(num) ? "Valid" : "Invalid"}`);
+            });
+            // Task 2: Extract Dates from Text
+            console.log("\n--Task 2: Extract Dates from Text--");
+            let textWithDates = "Today's date is 12/09/2025 and tomorrow will be 13/09/2025.";
+            let dateRegex = /\d{2}\/\d{2}\/\d{4}/g;
+            let dates = textWithDates.match(dateRegex);
+            console.log(dates);
+            // Task 3: Password Strength Checker
+            console.log("\n--Task 3: Password Strength Checker--");
+            let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+            let passwords = ["StrongPass1!", "weakpass"];
+            passwords.forEach(pass => {
+                console.log(`${pass} → ${passwordRegex.test(pass) ? "Strong Password" : "Weak Password"}`);
+            });
+            // Task 4: Find Duplicate Words
+            console.log("\n--Task 4: Find Duplicate Words--");
+            let sentence = "This is is a test test";
+            let dupRegex = /\b(\w+)\s+\1\b/g;
+            let duplicates = [];
+            let match;
+            while ((match = dupRegex.exec(sentence)) !== null) {
+                duplicates.push(match[1]);
+            }
+            console.log(duplicates);
+            // Task 5: Extract Hashtags from a Tweet
+            console.log("\n--Task 5: Extract Hashtags from a Tweet--");
+            let tweet = "Learning #JavaScript is #fun and #exciting!";
+            let hashtags = tweet.match(/#[A-Za-z0-9_]+/g);
+            console.log(hashtags);
+        </script>
+    </body>
+</html>
