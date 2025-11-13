@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Memory Game (4×5)</title>
+  <link rel="stylesheet" href="style2.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Memory Game — 4×5</h1>
+    </header>
+    <div class="info">
+      <div id="score">Score: 0 / 10</div>
+      <div id="moves">Moves: 0</div>
+      <div id="timer">Time Left: 180s</div>
+      <button id="restart">Restart</button>
+    </div>
+    <div id="grid" class="grid" aria-label="Memory grid"></div>
+  </div>
+  <!-- simple win modal -->
+  <div id="winModal" class="modal" style="display:none">
+    <div class="dialog">
+      <h2>You win! 🎉</h2>
+      <p id="winText"></p>
+      <button id="playAgain">Play Again</button>
+    </div>
+  </div>
+  <script>
+    // Simple Memory Game — no shuffling, countdown timer, beginner-friendly
+    // Uses only getElementById / querySelector / querySelectorAll for DOM access
+    const gridEl = document.getElementById('grid');
+    const scoreEl = document.getElementById('score');
+    const movesEl = document.getElementById('moves');
+    const timerEl = document.getElementById('timer');
+    const restartBtn = document.getElementById('restart');
+    const winModal = document.getElementById('winModal');
+    const winText = document.getElementById('winText');
+    const playAgain = document.getElementById('playAgain');
+    let firstCard = null;
+    let secondCard = null;
+    let lock = false; // prevents clicks during mismatch
+    let matched = 0;
+    let moves = 0;
+    let countdown = 180; // seconds
+    let timerId = null;
+    // Fixed card values (18 pairs, repeated twice) - no shuffling
+    // For simplicity we place pairs sequentially: A A B B C C ... so students can predict order
+    const PAIRS = ['🍎','🍇','🍉','🍓','🍒','🍋','🍐','🍊','🥕','🥑'];
+    // Build values array without shuffle
+    const cardValues = [];
+    for (let i = 0; i < PAIRS.length; i++){
+      cardValues.push(PAIRS[i]);
+      cardValues.push(PAIRS[i]);
+    }
+    // Render grid in a single page (no scroll)
+    function renderGrid(){
+      gridEl.innerHTML = '';
+      // create 36 cards in order (pairs adjacent)
+      cardValues.forEach((val, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.tabIndex = 0; // focusable
+        card.dataset.value = val;
+        card.dataset.index = idx;
+        card.setAttribute('aria-pressed','false');
+        card.setAttribute('aria-label','Face down card');
+        card.textContent = '❓';
+        // click and keyboard handlers
+        card.addEventListener('click', onCardClick);
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' '){
+            e.preventDefault(); onCardClick.call(card, e);
+          }
+        });
+        gridEl.appendChild(card);
+      });
+      // reset game state
+      firstCard = null; secondCard = null; lock = false; matched = 0; moves = 0;
+      updateHUD();
+      resetTimer();
+    }
+    function updateHUD(){
+      scoreEl.textContent = `Score: ${matched} / ${PAIRS.length}`;
+      movesEl.textContent = `Moves: ${moves}`;
+      timerEl.textContent = `Time Left: ${countdown}s`;
+    }
+    // Handle a card being clicked or activated
+    function onCardClick(e){
+      if (lock) return;
+      const card = (this === window) ? e.currentTarget : this;
+      // ignore if already matched or already flipped
+      if (card.classList.contains('flipped')) return;
+      // start timer on first action
+      if (!timerId) startTimer();
+      // reveal
+      card.classList.add('flipped');
+      card.textContent = card.dataset.value;
+      card.setAttribute('aria-pressed','true');
+      card.setAttribute('aria-label', `Revealed ${card.dataset.value}`);
+      if (!firstCard){
+        firstCard = card;
+        return;
+      }
+      // second card
+      secondCard = card;
+      moves++;
+      updateHUD();
+      // check match
+      if (firstCard.dataset.value === secondCard.dataset.value){
+        // matched
+        matched++;
+        firstCard = null; secondCard = null;
+        // win?
+        if (matched === PAIRS.length){
+          setTimeout(winGame, 300);
+        }
+      } else {
+        // not match: flip back after 700ms and lock clicks
+        lock = true;
+        setTimeout(() => {
+          firstCard.classList.remove('flipped');
+          secondCard.classList.remove('flipped');
+          firstCard.textContent = '❓';
+          secondCard.textContent = '❓';
+          firstCard.setAttribute('aria-pressed','false');
+          secondCard.setAttribute('aria-pressed','false');
+          firstCard.setAttribute('aria-label','Face down card');
+          secondCard.setAttribute('aria-label','Face down card');
+          firstCard = null; secondCard = null; lock = false;
+        }, 700);
+      }
+    }
+    // Countdown timer (counts down from `countdown` to 0)
+    function startTimer(){
+      if (timerId) return;
+      timerId = setInterval(() => {
+        countdown--;
+        timerEl.textContent = `Time Left: ${countdown}s`;
+        if (countdown <= 0){
+          clearInterval(timerId); timerId = null; endGame();
+        }
+      }, 1000);
+    }
+    function resetTimer(){
+      if (timerId) clearInterval(timerId);
+      timerId = null;
+      countdown = 180; // reset to 180s
+      timerEl.textContent = `Time Left: ${countdown}s`;
+    }
+    // Called when player wins
+    function winGame(){
+      if (timerId) clearInterval(timerId);
+      winText.textContent = `You found all pairs in ${moves} moves with ${countdown}s left!`;
+      winModal.style.display = 'flex';
+    }
+    // Called when time runs out
+    function endGame(){
+      // disable further clicks
+      document.querySelectorAll('.card').forEach(c => c.removeEventListener('click', onCardClick));
+      alert('Time is up! Your score: ' + matched + ' pairs.');
+    }
+    // Restart handlers
+    restartBtn.addEventListener('click', () => { winModal.style.display='none'; renderGrid(); });
+    playAgain.addEventListener('click', () => { winModal.style.display='none'; renderGrid(); });
+    // initial render
+    renderGrid();
+  </script>
+</body>
+</html>

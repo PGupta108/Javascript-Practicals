@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Resume Data Extractor — Single Test Input</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Roboto, "Segoe UI", Arial; padding: 20px; background:#f7f8fb; color:#111; }
+    textarea { width:100%; height:180px; font-family: monospace; padding:10px; border-radius:6px; border:1px solid #d0d7e0; box-sizing:border-box; }
+    pre { background:#fff; padding:15px; border-radius:8px; border:1px solid #e3e7ee; overflow:auto; }
+    button { padding:10px 14px; border-radius:8px; border:0; background:#2563eb; color:white; cursor:pointer; font-weight:600; }
+    .row { display:flex; gap:12px; margin-top:12px; }
+    .col { flex:1; }
+    label { font-weight:600; display:block; margin-bottom:6px; }
+    .small { font-size:13px; color:#555; margin-top:6px; }
+  </style>
+</head>
+<body>
+  <h2>Smart Resume Data Extractor</h2>
+  <p class="small">Click <strong>Process Resume</strong> to run extraction.</p>
+  <label for="resume">Resume input</label>
+  <textarea id="resume"></textarea>
+  <div class="row">
+    <div class="col">
+      <button id="processBtn">Process Resume</button>
+    </div>
+  </div>
+  <h3>Output</h3>
+  <pre id="output">{}</pre>
+  <script src="script.js"></script>
+</body>
+</html>

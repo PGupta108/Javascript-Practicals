@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Result Analytics</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script defer src="script.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background: #f5f5f5;
+    }
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      background: white;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #e2e2e2;
+    }
+    .highlight {
+      background-color: #b6fcb6;
+    }
+    button {
+      padding: 8px 16px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    #averageOutput {
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h2>Student Result Analytics Dashboard</h2>
+
+  <button id="loadFetch">Load with Fetch</button>
+  <button id="loadJQ">Load with jQuery</button>
+  <button id="showAvg">Show Subject Averages</button>
+
+  <div id="tableContainer"></div>
+  <div id="averageOutput"></div>
+</body>
+</html>

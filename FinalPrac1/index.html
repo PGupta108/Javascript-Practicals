@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>SIT Nagpur</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="stdinfo.html">Student Info</a></li>
+      <li><a href="#">Addmission</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+  <br>
+  <header>
+    <img src="logo.png" alt="SIT Nagpur Logo" class="logo-icon">
+    <h1>Welcome to SIT Nagpur</h1>
+  </header>
+  <main>
+    <p id="welcomeMessage"></p>
+    <button onclick="applyNow()" class="apply-btn">Apply Now</button>
+  </main>
+  <br>
+  <img src="sit.jpg" alt="Department Banner" width="100%" />
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const welcomeEl = document.getElementById("welcomeMessage");
+      welcomeEl.textContent = "Addmissions Open!";
+    });
+  </script> 
+</body>
+</html>

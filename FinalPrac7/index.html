@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Memory Game (4×5)</title>
+  <link rel="stylesheet" href="style2.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Memory Game — 4×5</h1>
+    </header>
+    <div class="info">
+      <div id="score">Score: 0 / 10</div>
+      <div id="moves">Moves: 0</div>
+      <div id="timer">Time Left: 180s</div>
+      <button id="restart">Restart</button>
+    </div>
+    <div id="grid" class="grid" aria-label="Memory grid"></div>
+  </div>
+ 
+  <div id="winModal" class="modal" style="display:none">
+    <div class="dialog">
+      <h2>You win! </h2>
+      <p id="winText"></p>
+      <button id="playAgain">Play Again</button>
+    </div>
+  </div>
+  <script>
+const grid = document.getElementById("grid");
+const scoreEl = document.getElementById("score");
+const movesEl = document.getElementById("moves");
+const timerEl = document.getElementById("timer");
+const restartBtn = document.getElementById("restart");
+const winModal = document.getElementById("winModal");
+const winText = document.getElementById("winText");
+const playAgain = document.getElementById("playAgain");
+
+const PAIRS = ["🍎","🍇","🍉","🍓","🍒","🍋","🍐","🍊","🥕","🥑"];
+let cards = [];
+let first = null;
+let second = null;
+let matched = 0;
+let moves = 0;
+let timeLeft = 180;
+let timer = null;
+
+function setupGame() {
+  
+  grid.innerHTML = "";
+  matched = 0;
+  moves = 0;
+  timeLeft = 180;
+  clearInterval(timer);
+  timer = null;
+  updateInfo();
+  
+  cards = [...PAIRS, ...PAIRS];
+
+  cards.forEach((emoji) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.textContent = "❓";
+    card.dataset.value = emoji;
+    card.addEventListener("click", flipCard);
+    grid.appendChild(card);
+  });
+}
+
+function updateInfo() {
+  scoreEl.textContent = `Score: ${matched} / ${PAIRS.length}`;
+  movesEl.textContent = `Moves: ${moves}`;
+  timerEl.textContent = `Time Left: ${timeLeft}s`;
+}
+
+function flipCard() {
+  if (this.classList.contains("flipped") || first && second) return;
+  if (!timer) startTimer();
+
+  this.textContent = this.dataset.value;
+  this.classList.add("flipped");
+
+  if (!first) {
+    first = this;
+  } else {
+    second = this;
+    moves++;
+    updateInfo();
+
+    if (first.dataset.value === second.dataset.value) {
+      matched++;
+      first = second = null;
+      if (matched === PAIRS.length) winGame();
+    } else {
+      setTimeout(() => {
+        first.textContent = "❓";
+        second.textContent = "❓";
+        first.classList.remove("flipped");
+        second.classList.remove("flipped");
+        first = second = null;
+      }, 700);
+    }
+  }
+}
+
+function startTimer() {
+  timer = setInterval(() => {
+    timeLeft--;
+    updateInfo();
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      alert(`Time's up! You matched ${matched} pairs.`);
+    }
+  }, 1000);
+}
+
+function winGame() {
+  clearInterval(timer);
+  winText.textContent = `You found all pairs in ${moves} moves with ${timeLeft}s left!`;
+  winModal.style.display = "flex";
+}
+
+restartBtn.onclick = () => { winModal.style.display = "none"; setupGame(); };
+playAgain.onclick = () => { winModal.style.display = "none"; setupGame(); };
+
+setupGame();
+</script>
+
+</body>
+</html>

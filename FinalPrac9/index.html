@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Personal Dashboard</title>
+  <style>
+    body {
+      font-family: Verdana, sans-serif;
+      transition: all 0.4s ease;
+      text-align: center;
+      padding: 20px;
+    }
+    .dark { background-color: #121212; color: white; }
+    .light { background-color: #ffffff; color: black; }
+
+    #controls button, select, #controls input {
+      margin: 6px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #fontChooser { padding: 6px 10px; }
+  </style>
+</head>
+<body>
+  <h1 id="welcomeText">Welcome!</h1>
+
+  <div id="controls">
+    <input type="text" id="userName" placeholder="Enter your name">
+    <button id="saveUser">Save Name</button>
+    <button id="themeBtn">Switch Theme</button>
+    <select id="fontChooser">
+      <option value="small">Small</option>
+      <option value="medium">Medium</option>
+      <option value="large">Large</option>
+    </select>
+    <button id="resetPrefs">Reset Preferences</button>
+  </div>
+
+  <p id="tabCounter"></p>
+
+  <h3>Feedback</h3>
+  <textarea id="feedback" rows="5" cols="40" placeholder="Your feedback..."></textarea>
+
+  <script>
+    const THEME_KEY = "themeMode";
+    const FONT_KEY  = "fontSizePref";
+    const NAME_KEY  = "username";         
+    const VISITS_KEY= "visits";           
+    const FEEDBACK_KEY = "feedbackText";  
+
+    function applyTheme(theme) {
+      document.body.classList.remove("light", "dark");
+      document.body.classList.add(theme);
+    }
+    let storedTheme = localStorage.getItem(THEME_KEY) || "light";
+    applyTheme(storedTheme);
+
+    document.getElementById("themeBtn").onclick = function() {
+      const current = document.body.classList.contains("light") ? "light" : "dark";
+      const next = current === "light" ? "dark" : "light";
+      applyTheme(next);
+      localStorage.setItem(THEME_KEY, next);
+    };
+
+    const fSelect = document.getElementById("fontChooser");
+    const FONT_MAP = {
+      small: "14px",
+      medium: "16px",
+      large: "20px"
+    };
+
+    function applyFont(sizeKey) {
+      const cssValue = FONT_MAP[sizeKey] || FONT_MAP.medium;
+      document.body.style.fontSize = cssValue;
+      fSelect.value = sizeKey;
+    }
+
+    fSelect.onchange = function() {
+      const f = fSelect.value;
+      applyFont(f);
+      localStorage.setItem(FONT_KEY, f);
+    };
+
+    const storedFont = localStorage.getItem(FONT_KEY);
+    if (storedFont && FONT_MAP[storedFont]) {
+      applyFont(storedFont);
+    } else {
+      applyFont("medium");
+    }
+
+    const nameInput = document.getElementById("userName");
+    const welcome = document.getElementById("welcomeText");
+
+    function showUsername(name) {
+      if (name && name.trim().length > 0) {
+        welcome.innerText = "Welcome, " + name.trim();
+      } else {
+        welcome.innerText = "Welcome!";
+      }
+    }
+
+    document.getElementById("saveUser").onclick = function() {
+      const user = nameInput.value.trim();
+      if (user.length > 0) {
+        localStorage.setItem(NAME_KEY, user);
+      } else {
+        localStorage.removeItem(NAME_KEY);
+      }
+      showUsername(user);
+    };
+
+    const storedName = localStorage.getItem(NAME_KEY);
+    if (storedName) {
+      nameInput.value = storedName;
+      showUsername(storedName);
+    } else {
+      showUsername(null);
+    }
+
+    let visits = sessionStorage.getItem(VISITS_KEY);
+    if (visits === null) {
+      visits = 0;
+    } else {
+      visits = Number(visits) || 0; 
+    }
+    visits = visits + 1;
+    sessionStorage.setItem(VISITS_KEY, visits);
+    document.getElementById("tabCounter").innerHTML =
+      `This tab has been refreshed ${visits} ${visits === 1 ? "time" : "times"}.`;
+
+    const fb = document.getElementById("feedback");
+
+    fb.addEventListener("input", () => {
+      sessionStorage.setItem(FEEDBACK_KEY, fb.value);
+    });
+    const savedFb = sessionStorage.getItem(FEEDBACK_KEY);
+    if (savedFb !== null) {
+      fb.value = savedFb;
+    }
+
+    document.getElementById("resetPrefs").onclick = function() {
+      localStorage.removeItem(THEME_KEY);
+      localStorage.removeItem(FONT_KEY);
+      localStorage.removeItem(NAME_KEY);
+      
+      location.reload();
+    };
+
+    function updateThemeButtonLabel() {
+      const t = document.body.classList.contains("light") ? "Switch to Dark" : "Switch to Light";
+      document.getElementById("themeBtn").innerText = t;
+    }
+    updateThemeButtonLabel();
+    // theme toggles
+    document.getElementById("themeBtn").addEventListener("click", updateThemeButtonLabel);
+  </script>
+</body>
+</html>

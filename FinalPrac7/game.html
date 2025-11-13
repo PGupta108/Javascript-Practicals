@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Memory Card Game — 6×6</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --card-bg:#e6eef8;
+      --accent:#0ea5a0;
+      --muted:#94a3b8;
+      --card-size:calc((min(800px,90vw) - 40px) / 6);
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, Arial; margin:0; min-height:100vh; background:linear-gradient(180deg,#071030 0%, #0f172a 100%); color:#e6eef8; display:flex; flex-direction:column; align-items:center; padding:24px}
+    header{width:100%; max-width:1100px; display:flex; gap:12px; align-items:center; justify-content:space-between}
+    h1{font-size:1.1rem; margin:0}
+    .controls{display:flex; gap:8px; align-items:center}
+    button,select{background:#071425; color:var(--card-bg); border:1px solid rgba(255,255,255,0.06); padding:8px 10px; border-radius:8px; cursor:pointer}
+    .hud{display:flex; gap:12px; align-items:center}
+    .hud div{background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px; font-size:0.95rem}
+
+    main{width:100%; max-width:1100px; margin-top:18px}
+    .board-wrap{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:16px; border-radius:12px}
+
+    /* responsive grid */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(6, 1fr);
+      gap:8px;
+      justify-items:center;
+      align-items:center;
+      padding:12px;
+    }
+
+    /* card styles */
+    .card{
+      width:100%;
+      aspect-ratio: 1 / 1;
+      perspective:1000px;
+      cursor:pointer;
+      border-radius:10px;
+      outline: none;
+    }
+    .card-inner{position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform 400ms ease; border-radius:10px}
+    .card.flip .card-inner{transform:rotateY(180deg)}
+
+    .face{position:absolute; inset:0; backface-visibility:hidden; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:clamp(18px, 4vw, 36px)}
+    .front{background:linear-gradient(180deg,#ffffff,#e6f0ff); color:#0b1220}
+    .back{background:linear-gradient(180deg,#072a3a,#0b3d4b); transform:rotateY(180deg); color:var(--card-bg)}
+
+    .modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(2,6,23,0.6);}
+    .dialog{background:#071425; color:var(--card-bg); padding:20px; border-radius:12px; width:min(520px,90%); text-align:center}
+
+    footer{margin-top:16px; color:var(--muted); font-size:0.9rem}
+
+    /* adjust grid for smaller screens */
+    @media (max-width:900px){
+      .grid{grid-template-columns:repeat(5,1fr)}
+    }
+    @media (max-width:700px){
+      .grid{grid-template-columns:repeat(4,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧠 Memory Card Game — 6 × 6</h1>
+    <div class="controls">
+      <label for="sizeSelect" style="display:none">Size</label>
+      <select id="sizeSelect" aria-label="Select grid size">
+        <option value="6" selected>6 × 6</option>
+        <option value="4">4 × 4</option>
+      </select>
+      <button id="shuffleBtn">🔀 New Game</button>
+      <div class="hud">
+        <div id="moves">Moves: 0</div>
+        <div id="score">Score: 0 / 18</div>
+        <div id="time">Time: 00:00</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="board-wrap">
+      <div id="grid" class="grid" role="grid" aria-label="Memory card grid"></div>
+    </section>
+  </main>
+
+  <div id="winModal" class="modal" style="display:none" role="dialog" aria-modal="true">
+    <div class="dialog" role="document">
+      <h2 id="winTitle">You win! 🎉</h2>
+      <p id="winStats"></p>
+      <div style="margin-top:12px; display:flex; gap:8px; justify-content:center">
+        <button id="playAgain">Play Again</button>
+        <button id="closeModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Tip: Use <kbd>Tab</kbd> to focus cards and <kbd>Enter</kbd>/<kbd>Space</kbd> to flip. Best time and moves are saved to localStorage.</footer>
+
+  <script>
+    /* -----------------------
+       Memory Game JS (vanilla)
+       - Uses only querySelector / querySelectorAll / getElementById for DOM access
+       - Key functions: shuffleCards(), renderGrid(), handleCardClick(), checkMatch(), resetTurn(), startTimer(), resetGame()
+       ----------------------- */
+
+    // Elements
+    const gridEl = document.getElementById('grid');
+    const movesEl = document.getElementById('moves');
+    const scoreEl = document.getElementById('score');
+    const timeEl = document.getElementById('time');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const sizeSelect = document.getElementById('sizeSelect');
+    const winModal = document.getElementById('winModal');
+    const winStats = document.getElementById('winStats');
+    const playAgain = document.getElementById('playAgain');
+    const closeModal = document.getElementById('closeModal');
+
+    // Game state
+    let gridSize = 6; // default (6x6)
+    let totalPairs = 18;
+    let cardValues = []; // array of values (each repeated twice)
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false; // debounces clicks during mismatch
+    let matchedPairs = 0;
+    let moves = 0;
+    let timerInterval = null;
+    let startTime = null;
+
+    // A pool of emoji values — 18 unique items required for 6x6
+    const EMOJI_POOL = [
+      '🍎','🍌','🍇','🍉','🍓','🍒','🍍','🥝','🍑','🍋','🍐','🥭','🍊','🌶️','🥕','🍆','🥑','🍄','⚽','🎸','🚗','✈️','🌞','⭐','🔥','💎','🎲','📚'
+    ];
+
+    /* ---------------------- Utility: Fisher-Yates shuffle ---------------------- */
+    function shuffleArray(arr){
+      for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    /* ---------------------- shuffleCards() ----------------------
+       Build an array of pairs and shuffle them.
+       Uses gridSize to determine totalPairs.
+    */
+    function shuffleCards(size){
+      gridSize = Number(size) || 6;
+      const cells = gridSize * gridSize;
+      totalPairs = cells / 2;
+      // take first totalPairs unique emojis
+      const pool = EMOJI_POOL.slice(0, totalPairs);
+      const doubled = pool.concat(pool);
+      cardValues = shuffleArray(doubled.slice());
+    }
+
+    /* ---------------------- renderGrid() ----------------------
+       Render the DOM grid of card elements based on cardValues.
+       Each card gets data-card-value and ARIA attributes. 
+    */
+    function renderGrid(){
+      // set grid columns responsively
+      gridEl.innerHTML = '';
+      gridEl.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+      cardValues.forEach((val, idx) => {
+        const cell = document.createElement('div');
+        cell.className = 'card';
+        cell.setAttribute('role','button');
+        cell.setAttribute('tabindex', '0');
+        cell.setAttribute('aria-pressed','false');
+        cell.setAttribute('aria-label','Face down card');
+        cell.dataset.cardValue = val;
+        cell.dataset.index = idx;
+
+        // inner structure for 3d flip
+        cell.innerHTML = `
+          <div class="card-inner">
+            <div class="face front">❓</div>
+            <div class="face back">${val}</div>
+          </div>`;
+
+        // click handler
+        cell.addEventListener('click', handleCardClick);
+        cell.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            handleCardClick.call(cell, e);
+          }
+        });
+
+        gridEl.appendChild(cell);
+      });
+
+      // reset visuals
+      moves = 0; matchedPairs = 0; firstCard = null; secondCard = null; lockBoard = false;
+      movesEl.textContent = `Moves: ${moves}`;
+      scoreEl.textContent = `Score: ${matchedPairs} / ${totalPairs}`;
+      stopTimer();
+      timeEl.textContent = `Time: 00:00`;
+    }
+
+    /* ---------------------- handleCardClick() ----------------------
+       Called when a card is clicked (or activated by keyboard)
+       Uses dataset, toggles .flip, and controls flow for matching.
+    */
+    function handleCardClick(e){
+      if (lockBoard) return; // ignore clicks during debounce
+      const card = (this === window) ? e.currentTarget : this; // support being called both ways
+      // ignore clicking already matched card
+      if (card.classList.contains('matched')) return;
+      // ignore clicking the same card twice
+      if (card === firstCard) return;
+      // start timer on first interaction
+      if (!startTime){ startTimer(); }
+      // ensure flip animation completes: we toggle class to show front
+      card.classList.add('flip');
+      card.setAttribute('aria-pressed','true');
+      card.setAttribute('aria-label', `Revealed ${card.dataset.cardValue}`);
+      if (!firstCard){
+        firstCard = card;
+        return;
+      }
+      // second click
+      secondCard = card;
+      moves++;
+      movesEl.textContent = `Moves: ${moves}`;
+      checkMatch();
+    }
+    /* ---------------------- checkMatch() ----------------------
+       Compare firstCard and secondCard values. If match => mark matched.
+       If not => flip back both after 700ms and lock board in the meantime.
+    */
+    function checkMatch(){
+      const isMatch = firstCard.dataset.cardValue === secondCard.dataset.cardValue;
+      if (isMatch){
+        // matched: mark and disable
+        firstCard.classList.add('matched');
+        secondCard.classList.add('matched');
+        firstCard.removeEventListener('click', handleCardClick);
+        secondCard.removeEventListener('click', handleCardClick);
+        firstCard.setAttribute('aria-pressed','true');
+        secondCard.setAttribute('aria-pressed','true');
+        matchedPairs++;
+        scoreEl.textContent = `Score: ${matchedPairs} / ${totalPairs}`;
+        resetTurn(true);
+        // if all pairs found -> win
+        if (matchedPairs === totalPairs){
+          setTimeout(() => showWinModal(), 350);
+        }
+        return;
+      }
+      // not a match: show both briefly then flip back
+      lockBoard = true;
+      setTimeout(() => {
+        firstCard.classList.remove('flip');
+        secondCard.classList.remove('flip');
+        firstCard.setAttribute('aria-pressed','false');
+        secondCard.setAttribute('aria-pressed','false');
+        firstCard.setAttribute('aria-label','Face down card');
+        secondCard.setAttribute('aria-label','Face down card');
+        resetTurn(false);
+      }, 700);
+    }
+    /* ---------------------- resetTurn() ----------------------
+       Resets first/second card variables and unlocks the board.
+       If `keep` true, we keep matched cards revealed.
+    */
+    function resetTurn(keep){
+      [firstCard, secondCard] = [null, null];
+      lockBoard = false;
+    }
+    /* ---------------------- Timer helpers ---------------------- */
+    function startTimer(){
+      startTime = Date.now();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        timeEl.textContent = `Time: ${formatTime(elapsed)}`;
+      }, 500);
+    }
+    function stopTimer(){
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null; startTime = null;
+    }
+    function formatTime(sec){
+      const m = String(Math.floor(sec/60)).padStart(2,'0');
+      const s = String(sec%60).padStart(2,'0');
+      return `${m}:${s}`;
+    }
+    /* ---------------------- showWinModal() ----------------------
+       Stops timer, shows modal with stats, saves bests to localStorage.
+    */
+    function showWinModal(){
+      stopTimer();
+      const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+      const timeStr = formatTime(elapsed);
+      winStats.innerHTML = `You found <strong>${matchedPairs}</strong> pairs in <strong>${moves}</strong> moves and <strong>${timeStr}</strong>.`;
+      // persist bests
+      persistBests(moves, elapsed);
+      winModal.style.display = 'flex';
+    }
+    function persistBests(movesCount, seconds){
+      const key = `memory_bests_${gridSize}`;
+      const prev = JSON.parse(localStorage.getItem(key) || '{}');
+      let improved = false;
+      if (!prev.moves || movesCount < prev.moves){ prev.moves = movesCount; improved = true; }
+      if (!prev.time || seconds < prev.time){ prev.time = seconds; improved = true; }
+      if (improved) localStorage.setItem(key, JSON.stringify(prev));
+    }
+    /* ---------------------- resetGame() ----------------------
+       Full reset: reshuffle, re-render, reset counters and timer.
+    */
+    function resetGame(){
+      // compute size and shuffle
+      const chosen = Number(sizeSelect.value) || 6;
+      shuffleCards(chosen);
+      renderGrid();
+    }
+    /* ---------------------- init ---------------------- */
+    shuffleBtn.addEventListener('click', resetGame);
+    sizeSelect.addEventListener('change', resetGame);
+    playAgain.addEventListener('click', () => { winModal.style.display='none'; resetGame(); });
+    closeModal.addEventListener('click', () => { winModal.style.display='none'; });
+    // close modal on outside click
+    winModal.addEventListener('click', (e) => { if (e.target === winModal) winModal.style.display='none'; });
+    // keyboard: Escape to close
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') winModal.style.display='none'; });
+    // initial setup: default 6x6
+    shuffleCards(gridSize);
+    renderGrid();
+    /* ---------------------- Accessibility note ----------------------
+       Each card is focusable (tabindex) and responds to Enter/Space.
+       ARIA attributes are updated when revealed/matched.
+    */
+  </script>
+</body>
+</html>
